@@ -1,0 +1,13 @@
+# System Files
+
+.*DS_Store
+*.pyc
+
+# Untracked Private Files
+
+settings.json
+
+# Other (Volatile/Large Files)
+
+db*.json
+*Archive*/
