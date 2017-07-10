@@ -1,13 +1,18 @@
 import os
 import json
-# import soundcloud  # regular package from pip
-import sc_v2 as soundcloud  # modified version of SC package
+
+try:
+    import soundcloud  # regular package from pip
+    official_SC_package = True
+except ImportError:
+    import sc_v2 as soundcloud  # modified version of SC package
+    official_SC_package = False
 
 
 class connect(object):
 
     """
-    Everything for Authentication
+    Authenticate with the SoundCloud API and read the secret ini configuration
     """
 
     def __init__(self):
@@ -18,7 +23,7 @@ class connect(object):
             self.secret = json.load(sttngs)
 
     def secret(self):
-        """Secret tokens"""
+        """Return secret tokens"""
         return self.secret
 
     def client(self):
@@ -32,6 +37,12 @@ class connect(object):
 
     def client_v2(self):
         """V2 API Endpoints"""
+        if official_SC_package:
+            print """
+            Error: only the official soundcoud-python package is available
+                attempting to use the default v1 API instead
+            """
+            return self.client()
         return soundcloud.Client(
             client_id=self.secret["client_id"],
             client_secret=self.secret["client_secret"],

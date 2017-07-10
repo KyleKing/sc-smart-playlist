@@ -40,11 +40,11 @@ def pt(raw_title):
     return raw_title.encode('ascii', 'ignore')
 
 
-def print_title(raw_title, extra='Title: ', color='blue'):
-    """Print title name"""
+def print_title(raw_title, preposition='Title: ', color='blue'):
+    """Safely print title names"""
     try:
         title = pt(raw_title)
-        print(cld("{}{}".format(extra, title), color))
+        print(cld("{}{}".format(preposition, title), color))
     except UnicodeEncodeError:
         print "Error: Can't display track title"
 
@@ -53,8 +53,7 @@ def log_activity(track, code, debug=False):
     """Print out debugging information based on a particular debug level"""
     SA = safe_attr(track)
     if code == 1 or code == 2 or code == 3:
-        print_title(SA.r("title"))
-        print(cld("> ID: {}".format(SA.r("id")), 'blue'))
+        print_title(SA.r("title"), "ID={}: ".format(SA.r("id")))
     if code == 2:
         print("tag_list: {}".format(SA.r("tag_list")))
         print("user_playback_count: {}".format(SA.r("user_playback_count")))
@@ -72,8 +71,6 @@ def log_activity(track, code, debug=False):
         dump(track)
         print(" ---------------------- ")
         print(" ")
-
-# ------------------------------------------------------------------------------
 
 
 def dump(obj):
@@ -95,7 +92,3 @@ def _dir(obj, debug=False):
     if debug:
         print "attrs:", attrs
     return attrs
-
-
-if __name__ == "__main__":
-    print 'Run Basic Tests...'
