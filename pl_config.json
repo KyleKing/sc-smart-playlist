@@ -1,9 +1,11 @@
 {
 	"README": {
-		"info": ["Create Playlist settings here",
-						"Opts: >,<,- = gt,lt,range {commas will be removed}",
-						"FYI: Playlist names cannot have '/' in the title",
-						"FYI: Duration is in ms (... * 60 * 1000)"]
+		"info": [
+			"Create Playlist settings here",
+			"Options:  >,<,-  gt,lt,range  {commas will be removed}",
+			"FYI: Playlist names cannot have '/' in the title",
+			"FYI: Duration is in ms (... * 60 * 1000)"
+		]
 	},
 	"Defaults": {
 			"title_prefix": "WARNING: not currently used",
@@ -28,6 +30,59 @@
 			"genres": ["alternative", "rock", "pop", "chill", "dance", "edm", "deep",
 								"house", "electro", "dubstep", "dub", "nightcore", "bass",
 								"hip", "hop", "rap", "indie", "alt", "trap"]
+		},
+		{
+			"title": "AUTO-Rand",
+			"random": "30%"
+		},
+		{
+			"title": "AUTO-Stuck on Repeat",
+			"plays": ">750,000"
+		},
+		{
+			"title": "AUTO-SONGS with COMMENTS!",
+			"comments": ">1,000",
+			"shuffle": false
+		},
+		{
+			"title": "AUTO-Underplayed",
+			"plays": "10,000 - 500,000"
+		},
+		{
+			"title": "AUTO-NEW PLAYLIST!",
+			"sources": ["reposts"],
+			"likes": ">1,000",
+			"comments": "<500",
+			"plays": "500-100,000"
+		},
+		{
+			"title": "Most Liked",
+			"sources": ["reposts"],
+			"likes": ">500,000",
+			"comments": "<500",
+			"plays": "500-10,000",
+			"defaults": ["shuffle", "defer to defaults intentionally?"]
+		},
+		{
+			"title": "All Go+ Songs (< 30 seconds)",
+			"go": true
+		},
+		{
+			"title": "Mixes (All songs 10 min+)",
+			"duration": ">600,000"
+		},
+		{
+			"title": "Just BOUNCE!",
+			"sources": ["reposts"],
+			"artists": ["Hudson Mohawke", "Grouch", "Eligh", "Lucian",
+									"Adventure Club", "FLUME", "Odesza",
+									"PETIT BISCUIT", "Galantis", "ROZES", "Lazer",
+									"Flux Pavilion", "Vanic", "K.Flay", "Unlike Pluto",
+									"Glitch Mob"]
+		},
+		{
+			"title": "Influencers",
+			"artists": ["Suicide Sheep", "Proximity"]
 		}
 	]
 }

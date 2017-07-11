@@ -101,9 +101,10 @@ class generate(object):
             # print 'new_pl', new_pl
             try:
                 self.client.put(playlist_uri, playlist={'tracks': new_pl})
-            except (requests.exceptions.ChunkedEncodingError):
+            except (requests.exceptions.ChunkedEncodingError or
+                    requests.exceptions.HTTPError):
                 # Ignore the error b/c playlist is successful anyway..
-                print cld('ChunkedEncodingError on updating PL...', 'red')
+                print cld('Ignored Error on updating PL...', 'red')
 
         # No playlist exists, make a new one!
         elif len(new_pl) != 0:

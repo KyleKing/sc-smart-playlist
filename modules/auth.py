@@ -38,10 +38,8 @@ class connect(object):
     def client_v2(self):
         """V2 API Endpoints"""
         if official_SC_package:
-            print """
-            Error: only the official soundcoud-python package is available
-                attempting to use the default v1 API instead
-            """
+            print """Error: using the official soundcoud-python package.
+Using the v1 API - for v2 additional modification is needed."""
             return self.client()
         return soundcloud.Client(
             client_id=self.secret["client_id"],

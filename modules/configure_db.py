@@ -18,7 +18,7 @@ class fetch_songs(object):
 
     def __init__(self):
         """Configure MongoDB and Secret Settings"""
-        self.db_songs = mongo.MongoDB("test_database", "test_collection")
+        self.db_songs = mongo.MongoDB("smart_pl", "song_collection")
         self.connect = auth.connect()  # Load secret parameters
 
     def db_songs(self):
@@ -39,8 +39,8 @@ class fetch_songs(object):
         self.client = self.connect.client()
         acount_id = self.connect.secret["some_account_id"]
         hrefs = [
-            '/me/activities',  # activity feed
-            '/users/{}/favorites'.format(acount_id),
+            '/me/activities?limit=25',  # activity feed
+            '/users/{}/favorites?limit=25'.format(acount_id),
             # '/users/{}/playlists'.format(acount_id),
         ]  # See: https://developers.soundcloud.com/docs/api/reference#me
         return self._pull(hrefs)
@@ -72,10 +72,11 @@ class fetch_songs(object):
                 for count, music in enumerate(obj):
                     song = self._parse_music(music)
                     self._prep_insert(song, music, cur_href, count)
-                print(cld("> Loop complete #{}\n".format(count + 1), 'green'))
+                print(cld("> Another {} items\n".format(count + 1), 'green'))
                 if hasattr(resp, 'next_href'):
                     next_href = resp.next_href
                 else:
+                    # Debug unknown response:
                     next_href = None
                     print cld("resp missing next_href:", 'red'), resp
                     print cld("resp of type:", 'red'), type(resp)
@@ -155,12 +156,3 @@ class fetch_songs(object):
             break
         else:
             self.db_songs.insert_one(song)
-
-
-# if __name__ == "__main__":
-#     # Run the full playlist maker
-#     fs = fetch_songs()
-#     # fs.summary()
-#     fs.purge()  # leave collection as is for now
-#     fs.parse_sources()
-#     fs.parse_sources_v2()
