@@ -4,34 +4,35 @@ DIY smart playlists for SoundCloud
 
 ## Overview
 
-The project breaks down into a couple of parts:
+Get started making your own smart playlists following these four steps:
 
-1. Configure the settings.json file with your credentials
+1. Create the settings.json file with your credentials
 2. Run configure.py to create your local MongoDB of SoundCloud tracks
-3. Configure the pl_config.json with your smart playlist logic
-4. Run main.py to parse through your PL configuration, your local song database, then generate the playlists on SoundCloud
+3. Create your smart playlists configuration file, pl_config.json
+4. Run main.py to parse through your pl_config, your local song database, then push the smart playlists to SoundCloud
 
 ### 1. Configure settings.json
 
-*FYI: You will need a SoundCloud client ID to continue. If you don't have one, you'll need to [request one here][1], which unfortunately can take a week or two for approval*
+*FYI: You will need a SoundCloud client ID to continue. If you don't have one, you'll need to [request one here][1], which may take up to 1-2 weeks to receive*
 
-Rename `settings.example.json` to `settings.json` and open the file in a text editor. You will need to enter your username, password, then the client_id and client_secret from the [app you registered][1].
+Download the Github repository to your local directory. Rename `settings.example.json` to `settings.json` and open the file in a text editor. You will need to enter your user name, password, then the client_id and client_secret from the [app you registered][1].
 
 ### 2. Run configure.py
 
-Create your local database of liked tracks and activities to create smart playlists from.
+> Create a local database of your liked tracks and activities that will be used to create smart playlists from
 
-1. Install required python packages. Run `pip install requirements.txt`
+1. Install required python packages. In a terminal window, navigate to the directory and run `pip install requirements.txt`
 2. In a new prompt, run `mongod` to open a mongo db client
 3. Configure with `python configure.py`
 
 ### 3. Configure pl_config.json
 
-The pl_config.json you downloaded with this repository has my entire list of smart playlists. You set the defaults that all playlists inherit from. For example, all playlists should include songs from the sources of "likes" and "reposts". Then in the specific Playlists settings you override these settings to create variety. (True?)
+The pl_config.json you downloaded with this repository has my personal smart playlists to get you started. Each playlist is defined in a JSON object and can optionally include a list of default keys, so that all playlists will inherit changes made to the defaults.
 
 ### 4. Run main.py
 
-----
+1. In a new prompt, run `mongod` to open a mongo db client
+2. Update playlists with `python main.py`
 
 ## Hacks and Caveats
 

@@ -37,18 +37,18 @@ class fetch_songs(object):
     def parse_sources(self):
         """V1 API Endpoints"""
         self.client = self.connect.client()
-        acount_id = self.connect.secret["some_account_id"]
+        acount_id = self.connect.secret["account_id"]
         hrefs = [
             '/me/activities?limit=25',  # activity feed
             '/users/{}/favorites?limit=25'.format(acount_id),
-            # '/users/{}/playlists'.format(acount_id),
+            '/users/{}/playlists'.format(acount_id),  # TODO
         ]  # See: https://developers.soundcloud.com/docs/api/reference#me
         return self._pull(hrefs)
 
     def parse_sources_v2(self):
         """V2 API Endpoints"""
         self.client = self.connect.client_v2()
-        acount_id = self.connect.secret["some_account_id"]
+        acount_id = self.connect.secret["account_id"]
         hrefs = [
             '/stream?limit=25',
             '/me/personalized-tracks?limit=5',  # Warn: resp is dict of lists

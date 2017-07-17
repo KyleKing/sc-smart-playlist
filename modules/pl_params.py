@@ -55,8 +55,6 @@ class parse_config():
     def info(self):
         """Return dict of full title name and index"""
         return {
-            # FIXME: not used
-            # "title": self.get("title_prefix") + self.get("title"),
             "title": self.get("title"),
             "shuffle": self.get("shuffle"),
             "idx": self.idx

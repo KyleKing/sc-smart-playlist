@@ -3,9 +3,10 @@
 .*DS_Store
 *.pyc
 
-# Untracked Private Files
+# Untracked Personal Files
 
 settings.json
+pl_config.json
 
 # Other (Volatile/Large Files)
 

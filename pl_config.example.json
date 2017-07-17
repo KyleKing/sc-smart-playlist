@@ -1,0 +1,114 @@
+{
+	"README": {
+		"info": [
+			"Create Playlist settings here",
+			"Options:  >,<,-  gt,lt,range  {commas will be removed}",
+			"FYI: Playlist names cannot have '/' in the title",
+			"FYI: Duration is in ms (... * 60 * 1000)"
+		]
+	},
+	"Defaults": {
+			"title": "default",
+			"sources": ["reposts", "likes", "tracks"],
+			"artists": ["DROELOE"],
+			"genres": ["electronic"],
+			"keyword_match": ["remix"],
+			"reposts": "500-10,000",
+			"plays": "500-10,000",
+			"likes": ">500,000",
+			"comments": "<500",
+			"created": ">2 months",
+			"random": "10%",
+			"shuffle": true,
+			"go": false,
+			"duration": ">30,100"
+		},
+	"Playlists": [
+		{
+			"title": "Remixes",
+			"keyword_match": ["remix", "edited"],
+			"defaults": ["shuffle", "go", "duration"]
+		},
+		{
+			"title": "Rock",
+			"genres": ["alternative", "rock", "indie", "alt"],
+			"defaults": ["shuffle", "go", "duration"]
+		},
+		{
+			"title": "Party",
+			"genres": ["pop", "chill", "dance", "edm", "deep", "trap", "bass",
+								"house", "electro", "dubstep", "dub", "nightcore"],
+			"defaults": ["shuffle", "go", "duration"]
+		},
+		{
+			"title": "Rap",
+			"genres": ["hip", "hop", "rap"],
+			"defaults": ["shuffle", "go", "duration"]
+		},
+		{
+			"title": "Random",
+			"random": "30%",
+			"defaults": ["shuffle", "go", "duration"]
+		},
+		{
+			"title": "Stuck on Repeat",
+			"plays": ">750,000",
+			"defaults": ["shuffle", "go", "duration"]
+		},
+		{
+			"title": "Most Commented",
+			"comments": ">1,000",
+			"shuffle": false,
+			"defaults": ["go", "duration"]
+		},
+		{
+			"title": "Way Underplayed",
+			"plays": "10,000 - 500,000",
+			"defaults": ["shuffle", "go", "duration"]
+		},
+		{
+			"title": "The Best of Kyle-King-11",
+			"sources": ["reposts"],
+			"plays": ">500,000",
+			"defaults": ["shuffle", "go", "duration"]
+		},
+		{
+			"title": "All of Kyle-King-11",
+			"sources": ["reposts"],
+			"defaults": ["shuffle", "go", "duration"]
+		},
+		{
+			"title": "Most Liked",
+			"sources": ["reposts"],
+			"likes": ">500,000",
+			"comments": "<500",
+			"plays": "500-10,000",
+			"defaults": ["shuffle", "go", "duration"]
+		},
+		{
+			"title": "All Go+ Songs",
+			"go": true,
+			"defaults": ["shuffle"]
+		},
+		{
+			"title": "Mixes",
+			"duration": ">600,000",
+			"defaults": ["shuffle"]
+		},
+		{
+			"title": "Just BOUNCE!",
+			"sources": ["reposts"],
+			"artists": ["Hudson Mohawke", "Grouch", "Eligh", "Lucian",
+									"Adventure Club", "FLUME", "Odesza",
+									"PETIT BISCUIT", "Galantis", "ROZES", "Lazer",
+									"Flux Pavilion", "Vanic", "K.Flay", "Unlike Pluto",
+									"Glitch Mob"],
+			"defaults": ["shuffle", "go", "duration"]
+		},
+		{
+			"title": "Influencers",
+			"artists": ["Suicide Sheep", "Proximity", "Cloud Kid"],
+			"defaults": ["shuffle", "go", "duration"]
+		}
+	]
+}
