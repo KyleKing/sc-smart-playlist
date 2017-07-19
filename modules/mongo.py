@@ -17,8 +17,8 @@ class Tiny(object):
 
     def insert(self, _obj):
         """Insert into database with additional checks"""
-        if '_id' in _obj:
-            _obj['_id'] = 'N/A'  # Remove non-ascii MongoDB '_id'
+        if "_id" in _obj:
+            _obj["_id"] = "N/A"  # Remove non-ascii MongoDB "_id"
         self.db.insert(_obj)
 
     def upsert(self, _obj, _query):
@@ -46,21 +46,21 @@ class MongoDB(object):
     def purge(self):
         """Purge all db entries"""
         self.collection.remove()
-        print 'Cleared', self.db.name, 'in col:', self.collection
+        print "Cleared", self.db.name, "in col:", self.collection
 
     # --------------------------------------------------------------------------
     # Debugging
 
     def info(self):
         for name in self.client.database_names():
-            if name not in ['admin', 'local']:
-                print('DB Name: {}'.format(name))
+            if name not in ["admin", "local"]:
+                print("DB Name: {}".format(name))
                 for col in self.client[name].collection_names():
                     _c = self.client[name][col].count()
-                    print('- C: {:04} N: {}'.format(_c, col))
+                    print("- C: {:04} N: {}".format(_c, col))
 
     def debug(self, obj={}, log=True):
-        db = Tiny('./db_dump.json')
+        db = Tiny("./db_dump.json")
         db.purge()
         for idx, match in enumerate(self.collection.find(obj)):
             match["0_debug"] = idx
@@ -77,7 +77,7 @@ class MongoDB(object):
         return self.collection.insert_one(obj)
 
     def set(self, query, obj):
-        return self.collection.update(query, {'$set': obj})
+        return self.collection.update(query, {"$set": obj})
 
     def delete_many(self, obj):
         return self.collection.delete_many(obj)

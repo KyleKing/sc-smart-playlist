@@ -17,8 +17,8 @@ class connect(object):
 
     def __init__(self):
         # Load secret parameters
-        fn = 'settings.json'
-        fn = fn if os.path.isfile(fn) else '../' + fn
+        fn = "settings.json"
+        fn = fn if os.path.isfile(fn) else "../" + fn
         with open(fn) as sttngs:
             self.secret = json.load(sttngs)
 
@@ -46,5 +46,5 @@ Using the v1 API - for v2 additional modification is needed."""
             client_secret=self.secret["client_secret"],
             username=self.secret["username"],
             password=self.secret["password"],
-            host='api-v2.soundcloud.com'
+            host="api-v2.soundcloud.com"
         )

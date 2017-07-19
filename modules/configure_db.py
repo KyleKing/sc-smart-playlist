@@ -13,9 +13,9 @@ class fetch_songs(object):
 
     # String comparisons for pl_param.py comparison
     sources = {
-        "reposts": ['activities', 'stream'],
-        "likes": ['favorites', 'likes'],
-        "tracks": ['playlists', 'personalized']
+        "reposts": ["activities", "stream"],
+        "likes": ["favorites", "likes"],
+        "tracks": ["playlists", "personalized"]
     }
 
     def __init__(self):
@@ -41,9 +41,9 @@ class fetch_songs(object):
         self.client = self.connect.client()
         acount_id = self.connect.secret["account_id"]
         hrefs = [
-            '/me/activities?limit=25',  # activity feed
-            '/users/{}/favorites?limit=25'.format(acount_id),
-            '/users/{}/playlists'.format(acount_id),  # TODO
+            "/me/activities?limit=25",  # activity feed
+            "/users/{}/favorites?limit=25".format(acount_id),
+            "/users/{}/playlists".format(acount_id),  # TODO
         ]  # See: https://developers.soundcloud.com/docs/api/reference#me
         return self._pull(hrefs)
 
@@ -52,9 +52,9 @@ class fetch_songs(object):
         self.client = self.connect.client_v2()
         acount_id = self.connect.secret["account_id"]
         hrefs = [
-            '/stream?limit=25',
-            '/me/personalized-tracks?limit=5',  # Warn: resp is dict of lists
-            '/users/{}/likes'.format(acount_id),
+            "/stream?limit=25",
+            "/me/personalized-tracks?limit=5",  # Warn: resp is dict of lists
+            "/users/{}/likes".format(acount_id),
         ]
         return self._pull(hrefs)
 
@@ -65,7 +65,7 @@ class fetch_songs(object):
         song = {}
         for __, next_href in enumerate(hrefs):
             lgr.debug("New href {}".format(next_href))
-            # print cld("\n\nNew href", 'red'), next_href, '\n\n'
+            # print cld("\n\nNew href", "red"), next_href, "\n\n"
             cur_href = next_href
             while next_href is not None:
                 # Unwrap response per HREF query request
@@ -76,7 +76,7 @@ class fetch_songs(object):
                     song = self._parse_music(music)
                     self._prep_insert(song, music, cur_href, count)
                 lgr.debug("> Enumerated another {} items".format(count + 1))
-                if hasattr(resp, 'next_href'):
+                if hasattr(resp, "next_href"):
                     next_href = resp.next_href
                 else:
                     # Debug unknown response:
@@ -84,8 +84,8 @@ class fetch_songs(object):
                     lgr.debug("Err: no next_href: {}".format(type(resp), resp))
                     if type(resp) is list:
                         for r_idx, thing in enumerate(resp):
-                            lgr.debug('resp ({}): {}'.format(r_idx, thing))
-                            lgr.debug('Attrs: {}'.format(utils._dir(thing)))
+                            lgr.debug("resp ({}): {}".format(r_idx, thing))
+                            lgr.debug("Attrs: {}".format(utils._dir(thing)))
         lgr.debug("\nComplete.\n")
         self.summary()
         return True
@@ -118,7 +118,7 @@ class fetch_songs(object):
         """Prepare to insert to DB"""
         if song:
             if "playlist" in song:
-                print cld("Skipping Pl:", 'red'), song["playlist"]["title"]
+                print cld("Skipping Pl:", "red"), song["playlist"]["title"]
             else:
                 # A single song
                 if type(song) is dict:
@@ -129,10 +129,10 @@ class fetch_songs(object):
                 # Unknown...
                 else:
                     songs = []
-                    print(cld("Failed to interpret music:", 'red'))
-                    print '\tOn counter', count, 'found:', music
-                    print '\tMusic has keys:', utils._dir(music)
-                    print '\tFull obj:', music.__dict__
+                    print(cld("Failed to interpret music:", "red"))
+                    print "\tOn counter", count, "found:", music
+                    print "\tMusic has keys:", utils._dir(music)
+                    print "\tFull obj:", music.__dict__
                 # Act on the list of songs
                 for song_ in songs:
                     utils.log_activity(song_, 1, True)
@@ -140,20 +140,20 @@ class fetch_songs(object):
                     song_["href"] = [cur_href]
                     self._insert(song_)
         else:
-            print cld('Unknown song', 'red'), song
-        # print ''  # optional line break
+            print cld("Unknown song", "red"), song
+        # print ""  # optional line break
 
     def _insert(self, song):
         """Make sure entry is unique before inserting"""
         query = {"id": song["id"]}
         for match in self.db_songs.find(query):
             if song["href"] in match["href"]:
-                break  # don't update db if href already listed
+                break  # don"t update db if href already listed
             # If existing entry, update with additional href search
             hrefs = copy.deepcopy(song["href"])
             hrefs.extend(match["href"])
             self.db_songs.set(query, {"href": hrefs})
-            # print cld('   {}[href]= {}'.format(match["id"], hrefs), 'blue')
+            # print cld("   {}[href]= {}".format(match["id"], hrefs), "blue")
             break
         else:
             self.db_songs.insert_one(song)
