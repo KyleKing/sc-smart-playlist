@@ -1,2 +1,4 @@
 pymongo==3.4.0
+tinydb==3.3.1
 soundcloud==0.5.0
+termcolor==1.1.0

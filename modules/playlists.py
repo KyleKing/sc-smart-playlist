@@ -44,7 +44,7 @@ class generate(object):
             prev_pls["id"].append(prev_pl.id)
             prev_pls["title"].append(prev_pl.title)
         if len(prev_pls["id"]) > 0:
-            lgr.debug("All prev_pls", prev_pls, "\n")
+            lgr.debug("All prev_pls: {}\n".format(prev_pls))
             return prev_pls
         else:
             return False

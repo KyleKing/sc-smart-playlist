@@ -21,7 +21,7 @@ Download the Github repository to your local directory. Rename `settings.example
 
 > Create a local database of your liked tracks and activities that will be used to create smart playlists from
 
-1. Install required python packages. In a terminal window, navigate to the directory and run `pip install requirements.txt`
+1. Install required python packages. In a terminal window, navigate to the directory and run `pip install -r requirements.txt`
 2. In a new prompt, run `mongod` to open a mongo db client
 3. Configure with `python configure.py`
 
