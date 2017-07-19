@@ -1,31 +1,30 @@
-# import copy
 import random
-import requests
-# from tqdm import tqdm
-from termcolor import colored as cld
 
 import auth
 import pl_params
+import requests
+import utils
+from termcolor import colored as cld
+
+# from tqdm import tqdm
+
+lgr = utils.create_logger(__name__, "__log.log", False)
 
 
 class generate(object):
-
-    """
-    Make playlists
-    """
+    """Make playlists"""
 
     def __init__(self, configure_songs):
         self.client = auth.connect().client()
         self._sngs = configure_songs
 
     def main(self):
-        """   do all the things!   """
-        # Loop all playlists from config
+        """Read playlist configuration and analyze against database"""
         p_cg = pl_params.parse_config(path='pl_config.json')
         prev_pls = self._which_pl()
         for idx in range(p_cg.len_idx()):
-            print cld('\n\nPL Title: {}'.format(p_cg.get("title")), 'blue')
-            print cld('PL[{}]: {}'.format(idx, p_cg.info()), 'blue')
+            lgr.debug('Parsing Playlist ({}/{}): {}'.format(
+                idx, p_cg.get("title"), p_cg.info()))
             p_cg.set_idx(idx)
             pl_songs = self._filter_songs(p_cg)
             # Reformat for format SoundCloud expects:
@@ -41,11 +40,11 @@ class generate(object):
         prev_pls = {'id': [], 'title': []}
         prev_pls_res = self.client.get("/me/playlists")
         for prev_pl in prev_pls_res:
-            print "Found pl (#{})  {}".format(prev_pl.id, prev_pl.title)
+            lgr.debug("Found pl (#{})  {}".format(prev_pl.id, prev_pl.title))
             prev_pls['id'].append(prev_pl.id)
             prev_pls['title'].append(prev_pl.title)
         if len(prev_pls['id']) > 0:
-            print 'All prev_pls', prev_pls, '\n'
+            lgr.debug('All prev_pls', prev_pls, '\n')
             return prev_pls
         else:
             return False
@@ -87,7 +86,7 @@ class generate(object):
             pl_idx = prev_pls['title'].index(p_cg.get('title'))
             prev_pl_id = prev_pls['id'][pl_idx]
             # TODO: no longer necessary, but cleaner implementation
-            print 'Clearing old pl: {}'.format(prev_pls['title'][pl_idx])
+            lgr.debug('Clearing old pl: {}'.format(prev_pls['title'][pl_idx]))
             self.clear_playlist(prev_pl_id)
             # Re-Fill playlist with songs:
             playlist_uri = self._make_PL_uri(prev_pl_id)
@@ -96,20 +95,21 @@ class generate(object):
             # chunks = np.array_split(new_pl, 10)
             # chunks = [new_pl[x:x + 20] for x in xrange(0, len(new_pl), 20)]
 
-            print 'Updating old pl: {} with {} songs'.format(
-                prev_pls['title'][pl_idx], len(new_pl))
+            lgr.debug('Updating old pl: {} with {} songs'.format(
+                prev_pls['title'][pl_idx], len(new_pl)))
             # print 'new_pl', new_pl
             try:
                 self.client.put(playlist_uri, playlist={'tracks': new_pl})
             except (requests.exceptions.ChunkedEncodingError or
                     requests.exceptions.HTTPError):
                 # Ignore the error b/c playlist is successful anyway..
+                lgr.debug('Ignored Error on updating PL...')
                 print cld('Ignored Error on updating PL...', 'red')
 
         # No playlist exists, make a new one!
         elif len(new_pl) != 0:
-            print 'Creating new playlist: {} with {}'.format(
-                prev_pls['title'][pl_idx], new_pl)
+            lgr.debug('Creating new playlist: `{}` with {} tracks'.format(
+                p_cg.get('title'), len(new_pl)))
             try:
                 self.client.post('/playlists', playlist={
                     'title': p_cg.get('title'),
@@ -118,6 +118,7 @@ class generate(object):
                 })
             except (requests.exceptions.ChunkedEncodingError):
                 # Ignore the error b/c playlist is successful anyway..
+                lgr.debug('ChunkedEncodingError on making new PL...')
                 print cld('ChunkedEncodingError on making new PL...', 'red')
 
     def clear_playlist(self, pl_id):

@@ -1,26 +1,33 @@
-import re
+import copy
 import json
 import pprint
 import random
+import re
+
+import configure_db
+import mongo
+import utils
 from termcolor import colored as cld
 
-import utils
-import mongo
-import configure_db
+# Create debugger
+fn = "modules/params.log"
+lgr = utils.create_logger(__name__, fn)
 
 
 class parse_config():
-
-    """
-    Load smart playlist parameters from static JSON file
-    """
+    """Load smart playlist parameters from static JSON file"""
 
     def __init__(self, debug=False, path='../pl_config.json'):
+        """Configure the default playlist configuration to read
+            debug (bool): optional argument for additional debugging
+            path (str): path to json config file
+        """
         self.idx = 0  # default to first playlist
-        self.path = path
+        # Localize arguments
         self.debug = debug
+        self.path = path
+        # Read config file
         with open(self.path) as config:
-            # Load json config file into name space
             self.data = json.load(config)
         self.default = self.data["Defaults"]
         self.PL = self.data["Playlists"]
@@ -53,12 +60,10 @@ class parse_config():
     # Externally available functions
 
     def info(self):
-        """Return dict of full title name and index"""
-        return {
-            "title": self.get("title"),
-            "shuffle": self.get("shuffle"),
-            "idx": self.idx
-        }
+        """Return playlist configuration and index"""
+        custom_pl = copy.deepcopy(self.PL[self.idx])
+        custom_pl["idx"] = self.idx
+        return custom_pl
 
     def set_idx(self, idx):
         """Update the ID used for each playlist configuration"""
@@ -70,7 +75,7 @@ class parse_config():
             self.idx = idx
 
     def len_idx(self):
-        """Number of playlists"""
+        """Return number of playlists"""
         return len(self.PL)
 
     def get(self, key):
@@ -163,8 +168,20 @@ class parse_config():
 
     # --------------------------------------------------------------------------
     # Choose which parameter to compare against with the if_() function
-
     def check_attr(self, trk, attr):
+        """Wrapper function to compare song against each attribute"""
+        attr = attr.strip().lower()
+        if attr == 'defaults':
+            defaults = self.get(attr)
+            # Check each default parameter from list
+            for default in defaults:
+                if not self.check_attr_(trk, default):
+                    return False
+            else:
+                return True
+        return self.check_attr_(trk, attr)
+
+    def check_attr_(self, trk, attr):
         """Compare song against each attribute"""
         attr = attr.strip().lower()
         # Custom rules relate attribute type to song key-value pair
@@ -172,8 +189,8 @@ class parse_config():
             if 'playback_count' in trk:
                 return self.if_(attr, trk['playback_count'])
             else:
-                print 'not attr', attr, 'in', utils._dir(trk)
-                print '\tFull:', trk
+                lgr.debug('no attr `{}` in `{}`'.format(attr, utils._dir(trk)))
+                lgr.debug('Full trk: {}'.format(trk))
                 return False
         #
         elif attr == 'likes':
@@ -187,8 +204,8 @@ class parse_config():
             if 'comment_count' in trk:
                 return self.if_(attr, trk['comment_count'])
             else:
-                print 'not attr', attr, 'in', utils._dir(trk)
-                print '\tFull:', trk
+                lgr.debug('no attr `{}` in `{}`'.format(attr, utils._dir(trk)))
+                lgr.debug('Full trk: {}'.format(trk))
                 return False
         #
         elif attr == 'random':
@@ -210,15 +227,15 @@ class parse_config():
             # attr = attr if attr is list else [attr]
             for logic in self.get(attr):
                 logic = [logic]
-                a = self.if_(False, trk['title'], logic)
-                trk_pub = trk['publisher_metadata']
-                if trk_pub and 'artist' in trk_pub:
-                    b = self.if_(False, trk_pub['artist'], logic)
-                else:
-                    b = False
-                c = self.if_(False, trk['tag_list'], logic)
-                d = self.if_(False, trk['description'], logic)
-                e = self.if_(False, trk['genre'], logic)
+                a = self.if_(False, trk['title'], logic=logic)
+                b = False
+                if 'publisher_metadata' in trk:
+                    trk_pub = trk['publisher_metadata']
+                    if trk_pub and 'artist' in trk_pub:
+                        b = self.if_(False, trk_pub['artist'], logic=logic)
+                c = self.if_(False, trk['tag_list'], logic=logic)
+                d = self.if_(False, trk['description'], logic=logic)
+                e = self.if_(False, trk['genre'], logic=logic)
                 # TODO: Check other things?
                 if a or b or c or d or e:
                     return True
@@ -231,8 +248,8 @@ class parse_config():
                 trk_pub = trk['publisher_metadata']
                 if trk_pub and 'artist' in trk_pub:
                     return self.if_(attr, trk_pub['artist'])
-            print 'not attr', attr, 'in', utils._dir(trk)
-            print '\tFull:', trk
+            lgr.debug('no attr `{}` in `{}`'.format(attr, utils._dir(trk)))
+            lgr.debug('Full trk: {}'.format(trk))
             return False
         #
         elif attr == 'genres':
@@ -240,20 +257,20 @@ class parse_config():
             if 'genre' in trk:
                 return self.if_(attr, trk['genre'])
             else:
-                print 'not attr', attr, 'in', utils._dir(trk)
-                print '\tFull:', trk
+                lgr.debug('no attr `{}` in `{}`'.format(attr, utils._dir(trk)))
+                lgr.debug('Full trk: {}'.format(trk))
                 return False
         #
         elif attr == 'sources':
             # Check for each matching href source
             sources_dict = configure_db.fetch_songs().sources
             for source_type in self.get(attr):
-                print 'source_type', source_type
+                lgr.debug('no source_type `{}`'.format(source_type))
                 # Use the lookup table for a list of v1/v2 sources
                 sources = sources_dict[source_type]
-                print 'sources', sources
+                lgr.debug('no sources `{}`'.format(sources))
                 for source in sources:
-                    print 'source', source, 'href', trk['href']
+                    lgr.debug('src:{} | href:{}'.format(sources, trk['href']))
                     if self.if_(False, trk['href'], logic=source):
                         return True
             else:
@@ -261,19 +278,21 @@ class parse_config():
         #
         elif attr == 'go':
             # If False, ignore any songs shorter than 30 sec (i.e. "go")
-            duration = '<31,000' if self.get(attr) else '>30,000'
-            return self.if_(False, trk['duration'], duration)
+            duration = '<31,000' if self.get(attr) else '>31,000'
+            return self.if_(False, trk['duration'], logic=duration)
         #
         elif attr == 'duration':
             return self.if_(attr, trk['duration'])
         #
-        elif attr == 'shuffle' or attr == 'title':
-            # Shuffle applied in aggregate
-            # Title is just the playlist title and not relevant for sorting
+        elif attr == 'shuffle':
+            return self.get(attr)
+        #
+        elif attr == 'title':
+            # Smart-playlist title is not relevant for sorting
             return True
         #
         else:
-            print 'Attr `{}` was not parsed'.format(attr)
+            lgr.debug('Attr: `{}` not parsed'.format(attr))
             return False
 
 

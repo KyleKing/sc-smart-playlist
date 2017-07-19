@@ -26,7 +26,7 @@
 	"Playlists": [
 		{
 			"title": "Remixes",
-			"keyword_match": ["remix", "edited"],
+			"keyword_match": ["remix", "edit", "flip"],
 			"defaults": ["shuffle", "go", "duration"]
 		},
 		{
@@ -86,7 +86,7 @@
 			"defaults": ["shuffle", "go", "duration"]
 		},
 		{
-			"title": "All Go+ Songs",
+			"title": "All Go+ Songs (< 30 seconds)",
 			"go": true,
 			"defaults": ["shuffle"]
 		},
@@ -107,7 +107,7 @@
 		},
 		{
 			"title": "Influencers",
-			"artists": ["Suicide Sheep", "Proximity", "Cloud Kid"],
+			"artists": ["Suicide Sheep", "Proximity", "Cloud Kid", "thissongissick.com"],
 			"defaults": ["shuffle", "go", "duration"]
 		}
 	]

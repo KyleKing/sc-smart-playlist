@@ -1,9 +1,11 @@
 import copy
-from termcolor import colored as cld
 
 import auth
-import utils
 import mongo
+import utils
+from termcolor import colored as cld
+
+lgr = utils.create_logger(__name__, "__log.log", False)
 
 
 class fetch_songs(object):
@@ -62,7 +64,8 @@ class fetch_songs(object):
         """Loop through all responses regardless of API Version"""
         song = {}
         for __, next_href in enumerate(hrefs):
-            print cld("\n\nNew href", 'red'), next_href, '\n\n'
+            lgr.debug("New href {}".format(next_href))
+            # print cld("\n\nNew href", 'red'), next_href, '\n\n'
             cur_href = next_href
             while next_href is not None:
                 # Unwrap response per HREF query request
@@ -72,20 +75,18 @@ class fetch_songs(object):
                 for count, music in enumerate(obj):
                     song = self._parse_music(music)
                     self._prep_insert(song, music, cur_href, count)
-                print(cld("> Another {} items\n".format(count + 1), 'green'))
+                lgr.debug("> Enumerated another {} items".format(count + 1))
                 if hasattr(resp, 'next_href'):
                     next_href = resp.next_href
                 else:
                     # Debug unknown response:
                     next_href = None
-                    print cld("resp missing next_href:", 'red'), resp
-                    print cld("resp of type:", 'red'), type(resp)
-                    print 'Attrs:', utils._dir(resp)
+                    lgr.debug("Err: no next_href: {}".format(type(resp), resp))
                     if type(resp) is list:
                         for r_idx, thing in enumerate(resp):
-                            print 'resp ({})'.format(r_idx), thing
-                            print 'Attrs:', utils._dir(thing)
-        print("\nComplete.\n")
+                            lgr.debug('resp ({}): {}'.format(r_idx, thing))
+                            lgr.debug('Attrs: {}'.format(utils._dir(thing)))
+        lgr.debug("\nComplete.\n")
         self.summary()
         return True
 

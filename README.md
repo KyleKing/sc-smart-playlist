@@ -1,6 +1,6 @@
 # sc-smart-playlist
 
-DIY smart playlists for SoundCloud
+DIY smart playlists for SoundCloud. Use the songs you've liked or reposted on Soundcloud to create new playlists by genre, number of likes, song duration, etc.
 
 ## Overview
 

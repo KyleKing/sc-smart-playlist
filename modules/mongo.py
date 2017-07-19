@@ -1,13 +1,11 @@
 import pprint
+
 import pymongo
 from tinydb import TinyDB
 
 
 class Tiny(object):
-
-    """
-    TinyDB Tools
-    """
+    """TinyDB Tools"""
 
     def __init__(self, pth):
         """Create database file"""
@@ -36,24 +34,18 @@ class Tiny(object):
 
 
 class MongoDB(object):
-
-    """
-    MongoDB Tools
-    """
+    """MongoDB Tools"""
 
     def __init__(self, db_name="ita_analysis", collection_name="ecl_data"):
-        """Use default client - 27017"""
+        """Use default client (27017) - `mongod` instance must be running"""
         self.client = pymongo.MongoClient("localhost", 27017)
         # Set Database Name, then Collection Name
         self.db = self.client[db_name]
         self.collection = self.db[collection_name]
 
     def purge(self):
-        """Clear out all db entries"""
-        # try:
-        self.collection.remove()  # purge the database collection
-        # except:
-        #     raise Exception('Error: No MongoDB running > run CMD `mongod`')
+        """Purge all db entries"""
+        self.collection.remove()
         print 'Cleared', self.db.name, 'in col:', self.collection
 
     # --------------------------------------------------------------------------
