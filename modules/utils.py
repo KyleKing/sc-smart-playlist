@@ -44,7 +44,10 @@ def pt(raw_title):
         from: http://stackoverflow.com/a/5146914/3219667
         raw_title (str): song title
     """
-    return raw_title.encode("ascii", "ignore")
+    if type(raw_title) is str or type(raw_title) is unicode:
+        return raw_title.encode("ascii", "ignore")
+    else:
+        return raw_title
 
 
 def print_title(raw_title, preposition="Title: ", color="blue"):
@@ -103,15 +106,12 @@ def _dir(obj, debug=False):
     return attrs
 
 
-def create_logger(name, fn, overwrite=False):
+def add_handler(logger, fn, overwrite=False):
     """Create logger
-        name (__name__): from source file
+        logger (class): logger instance
         fn (str): filename to write to
         overwrite (bool): optionally erase log last file
     """
-    global logging_level
-    logger = logging.getLogger(name)
-    logger.setLevel(logging_level)
     # Wipe then link file to handler
     if overwrite:
         open(fn, "w").close()
@@ -123,3 +123,15 @@ def create_logger(name, fn, overwrite=False):
     # Link handler to global logger
     logger.addHandler(fh)
     return logger
+
+
+def create_logger(name, fn, overwrite=False):
+    """Create logger
+        name (__name__): from source file
+        fn (str): filename to write to
+        overwrite (bool): optionally erase log last file
+    """
+    global logging_level
+    logger = logging.getLogger(name)
+    logger.setLevel(logging_level)
+    return add_handler(logger, fn, overwrite)

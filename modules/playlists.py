@@ -6,9 +6,7 @@ import requests
 import utils
 from termcolor import colored as cld
 
-# from tqdm import tqdm
-
-lgr = utils.create_logger(__name__, "__log.log", False)
+lgr = utils.create_logger(__name__, "__log.log", overwrite=False)
 
 
 class generate(object):
@@ -19,11 +17,11 @@ class generate(object):
         self._sngs = configure_songs
 
     def main(self):
-        """Read playlist configuration and analyze against database"""
+        """Read playlist configuration then parse the database"""
         p_cg = pl_params.parse_config(path="pl_config.json")
         prev_pls = self._which_pl()
         for idx in range(p_cg.len_idx()):
-            lgr.debug("Parsing Playlist ({}/{}): {}".format(
+            lgr.debug(">>Parsing Playlist ({}/{}): {}".format(
                 idx, p_cg.get("title"), p_cg.info()))
             p_cg.set_idx(idx)
             pl_songs = self._filter_songs(p_cg)
@@ -52,30 +50,29 @@ class generate(object):
     def _filter_songs(self, p_cg, debug=True):
         """Loop the filter all songs from database"""
         pl_songs = []
-        # FIXME: TQDM?
-        for count, song in (enumerate(self._sngs.db_songs.find({}))):
-            # title = utils.pt(song["title"])
+        for song in self._sngs.db_songs.find({}):
             # Compare each song to each playlist attribute
             #   If fail to match, break loop and skip
             #   If no fails, append the song to list of IDs for playlist
             attrs = p_cg.getattrs()
+            lgr.debug("Checking ({}): {}".format(
+                song["id"], utils.pt(song["title"])))
+            # lgr.debug(" < {} > : {}\n".format(song["id"], song))
+            results = {}
             for attr in attrs:
-                if not p_cg.check_attr(song, attr):
-                    # if debug:
-                    #     print cld("Fail({}):{}".format(attr, title), "red")
+                results[attr] = p_cg.check_attr(song, attr)
+                if not results[attr]:
+                    lgr.debug("X No Attr({}) in {}".format(attr, song["id"]))
                     break
             else:
-                # if debug:
-                #     print cld("Pass: {}".format(title), "green")
+                lgr.debug("! All Attrs found in {}".format(song["id"]))
                 pl_songs.append(song["id"])
+            lgr.debug("> Final ({}) for attrs ({})\n".format(results, attrs))
         # Remove any duplicate entries
         song_ids = list(set(pl_songs))
-        # Limit total size of the list to avoid an HTTPError
+        # Arbitrarily limit total size of the list to avoid an HTTPError
         max_songs = 465
-        if len(song_ids) > max_songs:
-            random.shuffle(song_ids)
-            return song_ids[:max_songs]
-        return song_ids
+        return song_ids[:max_songs] if len(song_ids) > max_songs else song_ids
 
     def upload_pl(self, new_pl, p_cg, prev_pls):
         """Push the filtered songs to SoundCloud"""

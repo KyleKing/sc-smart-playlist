@@ -6,6 +6,7 @@
 # Untracked Personal Files
 
 settings.json
+settings.backup.json
 pl_config.json
 
 # Other (Volatile/Large Files)

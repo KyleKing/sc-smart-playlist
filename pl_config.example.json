@@ -75,7 +75,7 @@
 		{
 			"title": "All of Kyle-King-11",
 			"sources": ["reposts"],
-			"defaults": ["shuffle", "go", "duration"]
+			"defaults": []
 		},
 		{
 			"title": "Most Liked",
