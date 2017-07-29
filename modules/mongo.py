@@ -1,6 +1,7 @@
 import pprint
 
 import pymongo
+import utils
 from tinydb import TinyDB
 
 
@@ -78,7 +79,7 @@ class MongoDB(object):
             query (dict): MongoDB search parameters
             log (bool): optionally print information to console
         """
-        db = Tiny("../tmp/db_dump.json")
+        db = Tiny(utils.check_tmp_dir("../tmp/db_dump.json"))
         db.purge()
         for idx, match in enumerate(self.collection.find(query)):
             match["0_debug"] = idx

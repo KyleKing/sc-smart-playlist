@@ -92,9 +92,9 @@ Example: https://api-v2.soundcloud.com/users/21434963/likes?client_id=<client>&l
 
  -->
 
-[1]: http://soundcloud.com/you/apps/
-[2]: http://soundcloud.com/users/kyle-the-coder/
-[3]: https://github.com/KyleKing/sc-smart-playlist/pl_config.example.json
+[1]: https://soundcloud.com/you/apps/
+[2]: https://soundcloud.com/kyle-the-coder
+[3]: https://github.com/KyleKing/sc-smart-playlist/blob/master/pl_config.example.json
 
 <!-- [n]: https://github.com/soundcloud/soundcloud-python -->
 <!-- [n]: https://github.com/KyleKing/soundcloud_playlist_maker/issues -->
