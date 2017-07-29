@@ -29,6 +29,24 @@ Download the Github repository to your local directory. Rename `settings.example
 
 The pl_config.json you downloaded with this repository has my personal smart playlists to get you started. Each playlist is defined in a JSON object and can optionally include a list of default keys, so that all playlists will inherit changes made to the defaults.
 
+Key | Example | Type | Description
+--- | --- | --- | ---
+`title` | "Smart Playlist #12" | `str` | Playlist Title
+`sources` | ["reposts", "likes", "tracks"] | `list` | Specify origin of song
+`artists` | ["DROELOE", "Modest Mouse"] | `list` | Keyword match against the artist attribute
+`genres` | ["electronic", "jazz"] | `list` | Keyword match against the genre attribute
+`keyword_match` | ["remix", "flip", "edit"] | `list` | Keyword match against genre, artist, title, and description
+`reposts` | "500-10,000" | `str` | Range, GTE, or LTE comparison
+`plays` | "1,000-10,000" | `str` | Range, GTE, or LTE comparison
+`likes` | ">500,000" | `str` | Range, GTE, or LTE comparison
+`comments` | "<500" | `str` | Range, GTE, or LTE comparison
+`created` | ">2 months" | `str` | Range, GTE, or LTE comparison
+`random` | "10%" | `str` | Ratio (i.e. 1 out of 10) songs will be added
+`shuffle` | true | `bool` | Either shuffle output list or keep in chronological order
+`go` | false | `bool` | True will include Go+ songs
+`duration` | ">30,100" | `str` | Range, GTE, or LTE comparison
+`repost_ratio` | "30%" | `str` | Ratio comparison of likes:reposts - i.e. if more than 1 in 3.3 people who like the song, repost it, add the song to the playlist
+
 ### 4. Run main.py
 
 1. In a new prompt, run `mongod` to open a mongo db client

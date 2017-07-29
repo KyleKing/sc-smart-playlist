@@ -13,9 +13,9 @@ class fetch_songs(object):
 
     # String comparisons for pl_param.py comparison
     sources = {
-        "reposts": ["activities", "stream"],
-        "likes": ["favorites", "likes"],
-        "tracks": ["playlists", "personalized"]
+        "reposts": ("activities", "stream"),
+        "likes": ("favorites", "likes"),
+        "tracks": ("playlists", "personalized")
     }
 
     def __init__(self):
@@ -40,11 +40,11 @@ class fetch_songs(object):
         """V1 API Endpoints"""
         self.client = self.connect.client()
         acount_id = self.connect.secret["account_id"]
-        hrefs = [
+        hrefs = (
             "/me/activities?limit=25",  # activity feed
             "/users/{}/favorites?limit=25".format(acount_id),
             "/users/{}/playlists".format(acount_id),  # TODO
-        ]  # See: https://developers.soundcloud.com/docs/api/reference#me
+        )  # See: https://developers.soundcloud.com/docs/api/reference#me
         return self._pull(hrefs)
 
     def parse_sources_v2(self):

@@ -1,5 +1,5 @@
-import os
 import json
+import os
 
 try:
     import soundcloud  # regular package from pip
@@ -10,13 +10,10 @@ except ImportError:
 
 
 class connect(object):
-
-    """
-    Authenticate with the SoundCloud API and read the secret ini configuration
-    """
+    """Authenticate with SoundCloud API and read secret ini configuration"""
 
     def __init__(self):
-        # Load secret parameters
+        """Load secret parameters"""
         fn = "settings.json"
         fn = fn if os.path.isfile(fn) else "../" + fn
         with open(fn) as sttngs:
@@ -39,7 +36,7 @@ class connect(object):
         """V2 API Endpoints"""
         if official_SC_package:
             print """Error: using the official soundcoud-python package.
-Using the v1 API - for v2 additional modification is needed."""
+Will use the v1 API. For v2, additional modification is needed."""
             return self.client()
         return soundcloud.Client(
             client_id=self.secret["client_id"],

@@ -14,3 +14,4 @@ pl_config.json
 db*.json
 *Archive*/
 *.log
+tmp/*

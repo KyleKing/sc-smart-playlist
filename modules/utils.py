@@ -64,7 +64,11 @@ def print_title(raw_title, preposition="Title: ", color="blue"):
 
 
 def log_activity(track, code, debug=False):
-    """Print out debugging information based on debug integer"""
+    """Print out debugging information based on debug integer
+        track (dict): song dictionary
+        code (int): code in range 1-3, where 3 is most verbose
+        debug (bool): optoinal extra verbose logging
+    """
     SA = safe_attr(track)
     if code == 1 or code == 2 or code == 3:
         print_title(SA.r("title"), "ID={}: ".format(SA.r("id")))
@@ -120,7 +124,6 @@ def add_handler(logger, fn, overwrite=False):
     # Format default logged line
     ln = ">>%(filename)s:%(lineno)d> %(message)s"
     fh.setFormatter(logging.Formatter(ln))
-    # Link handler to global logger
     logger.addHandler(fh)
     return logger
 
