@@ -8,10 +8,7 @@ import configure_db
 import mongo
 import utils
 
-# Create debugger
-fn = "__log.log"
-# fn = "modules/params.log"
-lgr = utils.create_logger(__name__, fn, overwrite=False)
+lgr = utils.create_logger(__name__, "../tmp/__log.log", overwrite=False)
 
 
 class parse_config():
@@ -31,23 +28,28 @@ class parse_config():
             self.data = json.load(config)
         self.default = self.data["Defaults"]
         self.PL = self.data["Playlists"]
+        # Indicate current playlist
         self._p("Curr PL = {}".format(self.PL[self.idx]))
-        # self._p(pp=self.data)
 
     def _p(self, info="", pp=False):
-        """Internal print method if debug is active"""
+        """Internal print method if debug is active
+            info (str): optional string to print if no pp
+            pp (bool): optionally log dictionary with pprint format
+        """
         if self.debug:
             try:
                 if pp:
                     lgr.debug(pprint.pformat(pp))
-                    # pprint(pp)
                 else:
                     lgr.debug("\t{}".format(info))
             except UnicodeEncodeError:
                 print "Error: Can't display something...carry on"
 
     def _try_parse(self, this, key):
-        """See if playlist-specific settings or revert to default"""
+        """See if playlist-specific settings or revert to default
+            this (dict): playlist parameter dictionary to try
+            key (str)
+        """
         try:
             return this[key]
         except(AttributeError, KeyError):
@@ -67,7 +69,9 @@ class parse_config():
         return custom_pl
 
     def set_idx(self, idx):
-        """Update the ID used for each playlist configuration"""
+        """Update the ID used for each playlist configuration
+            idx (int): index in list of playlists
+        """
         if type(idx) is not int:
             raise ValueError("Error: idx `{}` is not int".format(idx))
         elif idx > len(self.PL):
@@ -80,11 +84,15 @@ class parse_config():
         return len(self.PL)
 
     def get(self, key):
-        """Try to return a value from the pl_config"""
+        """Try to return a value from the pl_config
+            key (str)
+        """
         return self._try_parse(self.PL[self.idx], key)
 
     def getattrs(self, cb=False):
-        """Fetch all attributes from a given dictionary"""
+        """Fetch all attributes from a given dictionary
+            cb (pointer): optional dictionary callback
+        """
         attrs = []
         for key, value in self.PL[self.idx].iteritems():
             attrs.append(key)
@@ -102,12 +110,13 @@ class parse_config():
             value (?) value to test against from SoundCloud track
             logic (?) Optional direct logic value to circumvent "key"
         """
-        logic_ = copy.copy(logic)  # Store initial value for debugging
+        # logic_ = copy.copy(logic)  # Store initial value for debugging
         if not logic:
             logic = self.get(key)
-        lgr.debug("Logic: L:{} (L_:{})-V:{} / Types L:{}|V:{}".format(
-            utils.pt(logic), utils.pt(logic_), utils.pt(value),
-            type(logic), type(value)))
+        # lgr.debug("(if_): L:{} (L_:{})-V:{} / Types L:{}|V:{}".format(
+        #     utils.pt(logic), utils.pt(logic_), utils.pt(value),
+        lgr.debug("(if_): L:{}-V:{} / Types L:{}|V:{}".format(
+            utils.pt(logic), utils.pt(value), type(logic), type(value)))
 
         # (Regex) Compare logic against a *list of values*
         if type(value) is list:
@@ -163,10 +172,13 @@ class parse_config():
             elif "%" in logic:
                 # Random song selected XX out of 100 (i.e. "XX%")
                 percent, __ = logic.split("%")
-                rr = random.random()
-                result = (rr * 100) <= float(percent)
-                lgr.debug("\tRand Match: {} > {} ?{} ".format(
-                    percent, rr, result))
+                if type(value) is float or type(value) is int:
+                    result = (value > percent)
+                    lgr.debug("\tRand Match: {} > {} ?{} ".format(value, percent, result))
+                else:
+                    rr = random.random()
+                    result = (rr * 100) <= float(percent)
+                    lgr.debug("\tRand Match: {} > {} ?{} ".format(percent, rr, result))
                 return result
             else:
                 lgr.debug("Failed to parse: {}".format(logic))
@@ -179,7 +191,10 @@ class parse_config():
     # Choose which parameter to compare against with the if_() function
 
     def check_attr(self, trk, attr):
-        """Wrapper function to allow "default" list of attr"""
+        """Wrapper function to allow "default" list of attr
+            trk (dict): song dictionary returned from API
+            attr (str): key argument to pass to the pl_config file
+        """
         attr = attr.strip().lower()
         if attr == "defaults":
             defaults = self.get(attr)
@@ -212,11 +227,11 @@ class parse_config():
         elif attr == "likes":
             # Check number of likes statistic
             if "likes_count" in trk:
-                metric = trk["likes_count"]  # V1
+                likes = trk["likes_count"]  # V1
             else:
-                metric = trk["favoritings_count"]  # V2
-            lgr.debug("[likes]: `{}`".format(metric))
-            return self.if_(attr, metric)
+                likes = trk["favoritings_count"]  # V2
+            lgr.debug("[likes]: `{}`".format(likes))
+            return self.if_(attr, likes)
         #
         elif attr == "comments":
             # Check number of comments
@@ -236,39 +251,38 @@ class parse_config():
             lgr.debug("[reposts]: `{}`".format(trk["reposts_count"]))
             return self.if_(attr, trk["reposts_count"])
         #
+        elif attr == "repost_ratio":
+            # Check number of likes statistic
+            if "likes_count" in trk:
+                likes = trk["likes_count"]  # V1
+            else:
+                likes = trk["favoritings_count"]  # V2
+            if likes != 0 and hasattr(trk, "reposts_count"):
+                ratio = (100.0 * trk["reposts_count"]) / (likes * 1.0)
+                return self.if_(attr, ratio)
+            lgr.debug("Err: failed repost_ratio with likes={}".format(likes))
+            return False
+        #
         elif attr == "keyword_match":
             # Check each keyword against target strings
             for logic in self.get(attr):
                 logic = [logic]
-                # # Check suite of attributes
-                # for sub_attr in ["title", "tag_list",
-                #                  "description", "genre"]:
-                #     res = self.if_(False, utils.pt(trk[sub_attr]),
-                #                    logic=logic)
-                #     if res:
-                #         return True
-                # Check each attribute one-at-a-time to debug
-                titleM = self.if_(False, utils.pt(trk["title"]), logic=logic)
-                tagM = self.if_(False, trk["tag_list"], logic=logic)
-                descM = self.if_(False, trk["description"], logic=logic)
-                genreM = self.if_(False, trk["genre"], logic=logic)
+                # Check attributes
+                for sub_attr in ["title", "tag_list", "description", "genre"]:
+                    res = self.if_(False, utils.pt(trk[sub_attr]), logic=logic)
+                    if res:
+                        return True
                 # Safely parse the artist meta data:
-                artistM = False
                 if "publisher_metadata" in trk:
                     pub_ = trk["publisher_metadata"]
                     if pub_ and ("artist" in pub_):
-                        artistM = self.if_(False, pub_["artist"], logic=logic)
-                        if artistM:
+                        if self.if_(False, pub_["artist"], logic=logic):
                             return True
                     else:
                         lgr.debug("Err: no artist: `{}`".format(trk["id"]))
                 else:
                     lgr.debug("Err: no p_meta: `{}`".format(trk["id"]))
-                # Check if any matches were identified
-                if titleM or artistM or tagM or descM or genreM:
-                    args = (trk["id"], titleM, artistM, tagM, descM, genreM)
-                    lgr.debug("[keyword_match]: (ID:{}) titleM:{}|artistM:{}|tagM:{}|descM:{}|genreM:{}".format(*args))  # noqa
-                    return True
+            # Catch if the for loop completes without returning a value
             else:
                 lgr.debug("X [keyword_match]: (ID:{})".format(trk["id"]))
                 return False
@@ -332,6 +346,7 @@ class parse_config():
 
 
 if __name__ == "__main__":
+    """Manual tests"""
     db_songs = mongo.MongoDB("test_database", "test_collection")
     trk = db_songs.find_one()
     p_cg = parse_config(debug=True)
