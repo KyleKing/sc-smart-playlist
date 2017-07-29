@@ -5,7 +5,7 @@ import mongo
 import utils
 from termcolor import colored as cld
 
-lgr = utils.create_logger(__name__, "__log.log", False)
+lgr = utils.create_logger(__name__, "../tmp/__log.log", False)
 
 
 class fetch_songs(object):

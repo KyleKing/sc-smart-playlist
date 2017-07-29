@@ -1,4 +1,5 @@
 import logging
+import os
 
 from termcolor import colored as cld
 
@@ -110,6 +111,17 @@ def _dir(obj, debug=False):
     return attrs
 
 
+def check_tmp_dir(fn):
+    """Parse file path for the temp directory and correct the path
+        fn (str): absolute or relative file path
+    """
+    pth = os.path.join(os.getcwd(), fn)
+    if "modules" not in pth and "../" in pth:
+        return pth.replace("../", "")
+    else:
+        return pth
+
+
 def add_handler(logger, fn, overwrite=False):
     """Create logger
         logger (class): logger instance
@@ -135,6 +147,7 @@ def create_logger(name, fn, overwrite=False):
         overwrite (bool): optionally erase log last file
     """
     global logging_level
+    fn = check_tmp_dir(fn)
     logger = logging.getLogger(name)
     logger.setLevel(logging_level)
     return add_handler(logger, fn, overwrite)

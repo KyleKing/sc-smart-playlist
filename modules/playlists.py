@@ -6,13 +6,13 @@ import requests
 import utils
 from termcolor import colored as cld
 
-lgr = utils.create_logger(__name__, "__log.log", overwrite=False)
+lgr = utils.create_logger(__name__, "../tmp/__log.log", overwrite=False)
 
 
 class generate(object):
     """Make playlists"""
 
-    def __init__(self, configure_songs):
+    def __init__(self, configure_songs={}):
         """Initialize
             configure_songs (instance): `configure_db.fetch_songs()`
         """
@@ -40,7 +40,7 @@ class generate(object):
         """Return a list of all posted playlist names"""
         # Localize playlists already on account
         prev_pls = {"id": [], "title": []}
-        prev_pls_res = self.client.get("/me/playlists")
+        prev_pls_res = self.get("/me/playlists")
         for prev_pl in prev_pls_res:
             lgr.debug("Found pl (#{})  {}".format(prev_pl.id, prev_pl.title))
             prev_pls["id"].append(prev_pl.id)
@@ -138,6 +138,12 @@ class generate(object):
             pl_id (int): SoundCloud playlist identifier
         """
         # return "https://api.soundcloud.com/playlists/{}".format(pl_id)
-        playlist = self.client.get("/playlists/{}".format(pl_id))
+        playlist = self.get("/playlists/{}".format(pl_id))
         lgr.debug("*WIP Playlist Tracks: {}".format(playlist.tracks))
         return playlist.uri
+
+    def get(self, uri):
+        """Return the response from a SoundCloud http request
+            uri (str): SoundCloud url
+        """
+        return self.client.get(uri)

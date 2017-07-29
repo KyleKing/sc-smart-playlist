@@ -17,19 +17,19 @@ class connect(object):
         fn = "settings.json"
         fn = fn if os.path.isfile(fn) else "../" + fn
         with open(fn) as sttngs:
-            self.secret = json.load(sttngs)
+            self.secret_config = json.load(sttngs)
 
     def secret(self):
         """Return secret tokens"""
-        return self.secret
+        return self.secret_config
 
     def client(self):
         """V1 API Endpoints"""
         return soundcloud.Client(
-            client_id=self.secret["client_id"],
-            client_secret=self.secret["client_secret"],
-            username=self.secret["username"],
-            password=self.secret["password"],
+            client_id=self.secret_config["client_id"],
+            client_secret=self.secret_config["client_secret"],
+            username=self.secret_config["username"],
+            password=self.secret_config["password"],
         )
 
     def client_v2(self):
@@ -39,9 +39,9 @@ class connect(object):
 Will use the v1 API. For v2, additional modification is needed."""
             return self.client()
         return soundcloud.Client(
-            client_id=self.secret["client_id"],
-            client_secret=self.secret["client_secret"],
-            username=self.secret["username"],
-            password=self.secret["password"],
+            client_id=self.secret_config["client_id"],
+            client_secret=self.secret_config["client_secret"],
+            username=self.secret_config["username"],
+            password=self.secret_config["password"],
             host="api-v2.soundcloud.com"
         )
